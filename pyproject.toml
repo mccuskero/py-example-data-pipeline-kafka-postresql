@@ -1,0 +1,9 @@
+[project]
+name= "py-example-data-pipeline-kafka-cassandra"
+version = "0.1.0"
+description = "Mulitstage python data pipeline"
+dependencies = [
+   "loguru>=0.7.3" 
+]
+readme = "README.md"
+requires-python = ">=3.11"

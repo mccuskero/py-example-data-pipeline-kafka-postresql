@@ -1,2 +1,17 @@
-# py-example-data-pipeline-kafka-postresql
-This is an example of a python based data pipeline leveraging Docker, kafka, and postgresql
+# PROJECT
+
+## building
+
+create lock file
+
+```shell
+uv lock
+```
+
+## Testing
+
+To test out a python application locally from commandline
+
+```shell
+
+```
