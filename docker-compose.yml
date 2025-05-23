@@ -63,3 +63,18 @@ services:
     restart: "no"
     entrypoint: [ "bash", "-c", "/opt/bitnami/kafka/bin/kafka-topics.sh --create --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic 'flw.flower_events' --if-not-exists"]
 
+# install postgres service
+  postgres:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    networks:
+      - flw-pipeline-network
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+#      - POSTGRES_DB=data_pipeline_db
+    volumes:
+      # - postgres_data:/var/lib/postgresql/data
+      - /tmp/db:/var/lib/postgresql/data
+      - ./configs/postgresql/create-db.sql:/docker-entrypoint-initdb.d/create_database.sql
