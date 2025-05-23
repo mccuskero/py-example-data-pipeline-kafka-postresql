@@ -3,20 +3,38 @@ networks:
   flw-pipeline-network:
     driver: bridge
 
-# flw_1_ingestor service
+# going to start up the pipeline backwards... to ensure we have a working pipeline
+# starting with the flw-clf-test-api service
 services:
-  flw-1-ingestor:
-    image: ${PROJECT_NAME_INGESTOR}:latest
+  flw-clf-test-api:
+    image: ${PROJECT_NAME_CLF_TEST_API}:latest
     depends_on:
       kafkasetup:
         condition: service_completed_successfully
     networks:
       - flw-pipeline-network
-
+  flw-4-postprocessor:
+    image: ${PROJECT_NAME_POSTPROCESSOR}:latest
+    depends_on:
+      - flw-clf-test-api
+    networks:
+      - flw-pipeline-network
+  flw-3-clf-test-handler:
+    image: ${PROJECT_NAME_CLF_TEST_HANDLER}:latest
+    depends_on:
+      - flw-4-postprocessor
+    networks:
+      - flw-pipeline-network
   flw-2-preprocessor:
     image: ${PROJECT_NAME_PREPROCESSOR}:latest
     depends_on:
-      - flw-1-ingestor
+      - flw-3-clf-test-handler
+    networks:
+      - flw-pipeline-network
+  flw-1-ingestor:
+    image: ${PROJECT_NAME_INGESTOR}:latest
+    depends_on:
+      - flw-2-preprocessor
     networks:
       - flw-pipeline-network
 
