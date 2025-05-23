@@ -11,7 +11,7 @@ View the raw content of this file to understand the format.
   - [ ] create mock data generator
   - [ ] send data to a speciic topic (monitor topic?)
 - [ ] send results to postgresql
-  - [ ] create a results protobuf to send to postproessor... 
+  - [ ] create a results protobuf to send to postproessor...
 - [ ] Research if multiple pyproject.tomls are needed per app... or just use 1
 - [ ] Link in files from github e.g. TODO.md, docs dir, containing a RUNBOOK.md file?
 - [ ] Create helm chart to install on local/laptop/server k3s cluster

@@ -1,6 +1,6 @@
 # py-example-data-pipeline-kafka-postgresql project
 
-This project is a skelaton project used as a sandbox to create data pipelines in python, for research and then to scale out. 
+This project is a skelaton project used as a sandbox to create data pipelines in python, for research and then to scale out.
 
 ## building
 
