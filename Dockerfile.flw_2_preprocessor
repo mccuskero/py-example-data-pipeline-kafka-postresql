@@ -1,17 +1,17 @@
 # syntax=docker/dockerfile:1
 FROM python:3.12-slim AS builder
 
-WORKDIR /app
+WORKDIR /py-data-pipeline
 
 # Install uv
 RUN --mount=type=cache,target=/root/.cache/ \
     pip install uv
 
 # Create a virtual environment
-RUN uv venv /app/.venv
+RUN uv venv /py-data-pipeline/.venv
 
 # Copy the pyproject.toml and uv.lock files
-WORKDIR /app
+WORKDIR /py-data-pipeline
 COPY pyproject.toml uv.lock ./
 
 # Install the dependencies
@@ -28,21 +28,21 @@ FROM python:3.12
 RUN addgroup --system clf_user && adduser --system --group clf_user
 
 # Copy virtual environment from builder stage
-COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /py-data-pipeline/.venv /py-data-pipeline/.venv
 
 # copy application code
-WORKDIR /app
+WORKDIR /py-data-pipeline
 COPY . . 
 
 # Set Environment Variables
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/py-data-pipeline/.venv/bin:$PATH"
 ENV USER=clf_user
 
 # Change ownership of the application code
-RUN chown -R clf_user:clf_user /app
+RUN chown -R clf_user:clf_user /py-data-pipeline
 
 # Switch to non-root user
 USER clf_user
 
 # Run the application
-CMD ["python", "/app/apps/flw_2_preprocessor/main.py"]
+CMD ["python", "/py-data-pipeline/app/flw_2_preprocessor/main.py"]

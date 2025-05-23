@@ -45,4 +45,4 @@ RUN chown -R clf_user:clf_user /py-data-pipeline
 USER clf_user
 
 # Run the application
-CMD ["python", "/py-data-pipeline/app/flw_1_ingestor/main.py"]
+CMD ["python", "/py-data-pipeline/app/flw_3_clf_test_handler/main.py"]
