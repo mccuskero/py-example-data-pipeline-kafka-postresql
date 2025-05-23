@@ -128,3 +128,16 @@ clean-all:
 
 clean-images:
 	@docker system prune -a --filter label=project-name="$(PROJECT_NAME)" -f
+
+# extra clean commands
+clean-all-images:
+	@docker system prune -a -f
+
+clean-all-containers:
+	@docker system prune -f
+
+clean-all-volumes:
+	@docker system prune -a -f
+
+clean-all-networks:
+	@docker system prune -a -f
