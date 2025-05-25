@@ -7,9 +7,6 @@ View the raw content of this file to understand the format.
 ## Todo
 
 - [ ] stub the classifer API, return output, randomaly, but from list
-- [ ] create protobuf and send events through pipeline
-  - [ ] create mock data generator
-  - [ ] send data to a speciic topic (monitor topic?)
 - [ ] send results to postgresql
   - [ ] create a results protobuf to send to postproessor...
 - [ ] Research if multiple pyproject.tomls are needed per app... or just use 1
@@ -18,9 +15,10 @@ View the raw content of this file to understand the format.
 
 ### In Progress
 
-- [ ] setup to use the py-ml-pytorch-iris-uv-docker project
-  - [ ] update the docker-compose to use the image create there to start up
-  - [ ] remove the dir here...
+- [x] Work on kafka messaging, protobuf, and asyncio
+- [x] create protobuf and send events through pipeline
+  - [x] create mock data generator
+  - [x] send data to a speciic topic (monitor topic?)
 
 ### Done ✓
 
@@ -31,3 +29,6 @@ View the raw content of this file to understand the format.
   - [x] flw_2_preprocessor
   - [x] and the rest...
 - [x] Add in postgresql with database, using startup script
+- [x] setup to use the py-ml-pytorch-iris-uv-docker project
+  - [x] update the docker-compose to use the image create there to start up
+  - [x] remove the dir here...
