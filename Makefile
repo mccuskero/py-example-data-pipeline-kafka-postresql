@@ -2,36 +2,18 @@
 
 # Project: flw-1-ingestor
 PROJECT_NAME := flw-1-ingestor
-DOCKERFILE_CLF_TEST_API := Dockerfile.flw_clf_test_api
+# internal project names
 DOCKERFILE_INGESTOR := Dockerfile.flw_1_ingestor
 DOCKERFILE_PREPROCESSOR := Dockerfile.flw_2_preprocessor
 DOCKERFILE_CLF_TEST_HANDLER := Dockerfile.flw_3_clf_test_handler
 DOCKERFILE_POSTPROCESSOR := Dockerfile.flw_4_postprocessor
-export PROJECT_NAME_CLF_TEST_API := flw-clf-test-api
 export PROJECT_NAME_INGESTOR := flw-1-ingestor
 export PROJECT_NAME_PREPROCESSOR := flw-2-preprocessor
 export PROJECT_NAME_CLF_TEST_HANDLER := flw-3-clf-test-handler
 export PROJECT_NAME_POSTPROCESSOR := flw-4-postprocessor
+# Project: py-pytorch-clf-api is created from another project located at: https://github.com/mccuskero/py-ml-pytorch-iris-uv-docker
+export ClF_PROJECT_NAME := py-pytorch-clf-api
 
-# Dockerfile commands a new image with the build
-# docker commands for flw-clf-test-api
-docker-build-flw-clf-test-api:
-	docker build -f $(DOCKERFILE_CLF_TEST_API) -t $(PROJECT_NAME_CLF_TEST_API):latest .
-
-run-flw-clf-test-api:
-	docker run --name $(PROJECT_NAME_CLF_TEST_API) -p 8000:8000 $(PROJECT_NAME_CLF_TEST_API):latest
-
-rm-flw-clf-test-api:
-	docker rm $(PROJECT_NAME_CLF_TEST_API)
-
-stop-flw-clf-test-api:
-	docker stop $(PROJECT_NAME_CLF_TEST_API)
-
-shell-flw-clf-test-api:
-	docker run -it --rm $(PROJECT_NAME_CLF_TEST_API):latest /bin/bash
-
-attach-flw-clf-test-api:
-	docker exec -it $(PROJECT_NAME_CLF_TEST_API) /bin/bash
 
 # docker commands for flw-1-ingestor
 docker-build-flw-1-ingestor:
@@ -112,11 +94,18 @@ attach-flw-4-postprocessor:
 
 
 # run the data pipeline
-run: docker-build-flw-clf-test-api docker-build-flw-1-ingestor \
+run: docker-build-flw-1-ingestor \
 	docker-build-flw-2-preprocessor \
 	docker-build-flw-3-clf-test-handler \
 	docker-build-flw-4-postprocessor
-	@docker-compose up
+	@docker-compose up -d
+#	@docker-compose up
+
+logs:
+	@docker-compose logs -f
+
+stop:
+	@docker-compose down
 
 # clean up all the docker images and containers
 clean:

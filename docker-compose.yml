@@ -4,19 +4,21 @@ networks:
     driver: bridge
 
 # going to start up the pipeline backwards... to ensure we have a working pipeline
-# starting with the flw-clf-test-api service
+# starting with the py-pytorch-clf-api service
 services:
-  flw-clf-test-api:
-    image: ${PROJECT_NAME_CLF_TEST_API}:latest
+  py-pytorch-clf-api:
+    image: ${ClF_PROJECT_NAME}:latest
     depends_on:
       kafkasetup:
         condition: service_completed_successfully
     networks:
       - flw-pipeline-network
+    ports:
+      - 8000:8000
   flw-4-postprocessor:
     image: ${PROJECT_NAME_POSTPROCESSOR}:latest
     depends_on:
-      - flw-clf-test-api
+      - py-pytorch-clf-api
     networks:
       - flw-pipeline-network
   flw-3-clf-test-handler:
