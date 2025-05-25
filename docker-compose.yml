@@ -35,6 +35,11 @@ services:
       - flw-pipeline-network
   flw-1-ingestor:
     image: ${PROJECT_NAME_INGESTOR}:latest
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - KAFKA_GROUP_ID=${KAFKA_GROUP_ID}
+      - KAFKA_TOPICS=${KAFKA_TOPICS}
+      - KAFKA_STATS_INTERVAL_MS=${KAFKA_STATS_INTERVAL_MS}
     depends_on:
       - flw-2-preprocessor
     networks:
