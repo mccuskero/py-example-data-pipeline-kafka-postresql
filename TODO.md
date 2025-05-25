@@ -18,8 +18,9 @@ View the raw content of this file to understand the format.
 
 ### In Progress
 
-- [ ] standup services
-  - [ ] flw_1_ingestor
+- [ ] setup to use the py-ml-pytorch-iris-uv-docker project
+  - [ ] update the docker-compose to use the image create there to start up
+  - [ ] remove the dir here...
 
 ### Done ✓
 
