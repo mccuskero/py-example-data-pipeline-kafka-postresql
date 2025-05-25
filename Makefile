@@ -14,6 +14,11 @@ export PROJECT_NAME_POSTPROCESSOR := flw-4-postprocessor
 # Project: py-pytorch-clf-api is created from another project located at: https://github.com/mccuskero/py-ml-pytorch-iris-uv-docker
 export ClF_PROJECT_NAME := py-pytorch-clf-api
 
+# kafka env variables
+export KAFKA_BOOTSTRAP_SERVERS := kafka:9092
+export KAFKA_GROUP_ID := flw
+export KAFKA_TOPICS := 'flower_events'
+export KAFKA_STATS_INTERVAL_MS := 1000
 
 # docker commands for flw-1-ingestor
 docker-build-flw-1-ingestor:
@@ -91,10 +96,12 @@ shell-flw-4-postprocessor:
 attach-flw-4-postprocessor:
 	docker exec -it $(PROJECT_NAME_POSTPROCESSOR) /bin/bash
 
-
+# run the data pipeline
+run:
+	@docker-compose up -d
 
 # run the data pipeline
-run: docker-build-flw-1-ingestor \
+build-and-run: docker-build-flw-1-ingestor \
 	docker-build-flw-2-preprocessor \
 	docker-build-flw-3-clf-test-handler \
 	docker-build-flw-4-postprocessor
