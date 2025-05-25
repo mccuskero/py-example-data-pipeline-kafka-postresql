@@ -39,4 +39,4 @@ View the raw content of this file to understand the format.
   - [x] pass in env variables from Makefile, to Dockerfile
   - [x] pass in base image from Makefile...
   - [x] create consumer in ingester to create events
-
+  
