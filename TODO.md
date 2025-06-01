@@ -13,8 +13,13 @@ View the raw content of this file to understand the format.
 - [ ] Link in files from github e.g. TODO.md, docs dir, containing a RUNBOOK.md file?
 - [ ] Create helm chart to install on local/laptop/server k3s cluster
 - [ ] create protobuf and send events through pipeline
+- [ ] use asyncio, for producer
 - [ ] Work on kafka messaging consumer, protobuf, and asyncio
   - [ ] need to define how the ingestor will work, from file, or kafka
+- [ ] Work on integrating unit testing into framework
+  - [ ] Integrate serialize, deserialize
+  - [ ] integrate tox and uv
+  - [ ] use a docker image to test
 
 ### In Progress
 
@@ -22,6 +27,9 @@ View the raw content of this file to understand the format.
   - [x] create mock data generator
   - [x] send data to a speciic topic (monitor topic?)
   - [x] have consumer read in messages, print out, and pass on to another topic
+  - [x] Goal is to go end to end, less insert to postgress
+- [x] Work on integrating unit testing into framework
+  - [x] Integrate a single unit test for probuf message
 
 ### Done ✓
 

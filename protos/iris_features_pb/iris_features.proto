@@ -1,0 +1,27 @@
+//
+// The Iris dataset in scikit-learn contains 150 samples of three species of Iris flowers, 
+// each with four features: sepal length, sepal width, petal length, and petal width. These 
+// features are measured in centimeters and are used to classify the flowers into their respective 
+// species (setosa, versicolor, and virginica). 
+// Features:
+// Sepal Length: The length of the sepal, measured in centimeters.
+// Sepal Width: The width of the sepal, measured in centimeters.
+// Petal Length: The length of the petal, measured in centimeters.
+// Petal Width: The width of the petal, measured in centimeters. 
+//
+
+syntax = "proto3"; // specifies the protocol buffer syntax version
+
+package iris_features_pb;
+
+message IrisFeatures {
+  float sepal_length = 1; // The length of the sepal, measured in centimeters.
+  float sepal_width = 2; // The width of the sepal, measured in centimeters.
+  float petal_length = 3; // The length of the petal, measured in centimeters.
+  float petal_width = 4; // The width of the petal, measured in centimeters.
+}
+
+message IrisFeaturesList {
+  repeated IrisFeatures iris_features_list = 1; // Repeated field for a collection of Animal messages.
+}
+
