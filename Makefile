@@ -20,6 +20,16 @@ export KAFKA_GROUP_ID := flw
 export KAFKA_TOPICS := 'flower_events'
 export KAFKA_STATS_INTERVAL_MS := 1000
 
+# protobuff env variables
+export PROTO_PATH := protos
+export PROTO_FILE := iris_feature_msgs.proto
+export PROTO_OUT_DIR := src
+
+# protoc commands
+# NOTE: that the "-I" is needed to remove "protos" from the output dir creation
+protoc-all:
+	protoc  -I $(PROTO_PATH) --python_out=$(PROTO_OUT_DIR) $(PROTO_PATH)/**/*.proto
+
 # docker commands for flw-1-ingestor
 docker-build-flw-1-ingestor:
 	docker build -f $(DOCKERFILE_INGESTOR) -t $(PROJECT_NAME_INGESTOR):latest .
@@ -113,6 +123,13 @@ logs:
 
 stop:
 	@docker-compose down
+
+# run the tests
+test-protobuf: protoc-all
+	@pytest tests/protobuf/test_ingestor_messages.py
+
+# run the tests, including the protobuf files
+test-all: test-protobuf
 
 # clean up all the docker images and containers
 clean:
