@@ -3,10 +3,12 @@
 # Project: flw-1-ingestor
 PROJECT_NAME := flw-1-ingestor
 # internal project names
+DOCKERFILE_MOCK_DATA_GENERATOR := Dockerfile.flw_0_mock_data_generator
 DOCKERFILE_INGESTOR := Dockerfile.flw_1_ingestor
 DOCKERFILE_PREPROCESSOR := Dockerfile.flw_2_preprocessor
 DOCKERFILE_CLF_TEST_HANDLER := Dockerfile.flw_3_clf_test_handler
 DOCKERFILE_POSTPROCESSOR := Dockerfile.flw_4_postprocessor
+export PROJECT_NAME_MOCK_DATA_GENERATOR := flw-0-mock-data-generator
 export PROJECT_NAME_INGESTOR := flw-1-ingestor
 export PROJECT_NAME_PREPROCESSOR := flw-2-preprocessor
 export PROJECT_NAME_CLF_TEST_HANDLER := flw-3-clf-test-handler
@@ -17,7 +19,8 @@ export ClF_PROJECT_NAME := py-pytorch-clf-api
 # kafka env variables
 export KAFKA_BOOTSTRAP_SERVERS := kafka:9092
 export KAFKA_GROUP_ID := flw
-export KAFKA_TOPICS := 'flower_events'
+export KAFKA_TOPICS := fwevents
+export KAFKA_MOCK_DATA_TOPIC := fwevents
 export KAFKA_STATS_INTERVAL_MS := 1000
 
 # protobuff env variables
@@ -30,12 +33,31 @@ export PROTO_OUT_DIR := src
 protoc-all:
 	protoc  -I $(PROTO_PATH) --python_out=$(PROTO_OUT_DIR) $(PROTO_PATH)/**/*.proto
 
+# docker commands for flw-0-mock-data-generator
+docker-build-flw-0-mock-data-generator:
+	docker build -f $(DOCKERFILE_MOCK_DATA_GENERATOR) -t $(PROJECT_NAME_MOCK_DATA_GENERATOR):latest .
+
+run-flw-0-mock-data-generator: rm-flw-0-mock-data-generator
+	docker run --init -it --env-file .env-dev --name $(PROJECT_NAME_MOCK_DATA_GENERATOR) $(PROJECT_NAME_MOCK_DATA_GENERATOR):latest
+
+rm-flw-0-mock-data-generator:
+	-docker rm $(PROJECT_NAME_MOCK_DATA_GENERATOR) || true
+
+stop-flw-0-mock-data-generator:
+	docker stop $(PROJECT_NAME_MOCK_DATA_GENERATOR)
+
+shell-flw-0-mock-data-generator:
+	docker run -it --rm $(PROJECT_NAME_MOCK_DATA_GENERATOR):latest /bin/bash
+
+attach-flw-0-mock-data-generator:
+	docker exec -it $(PROJECT_NAME_MOCK_DATA_GENERATOR) /bin/bash
+
 # docker commands for flw-1-ingestor
 docker-build-flw-1-ingestor:
 	docker build -f $(DOCKERFILE_INGESTOR) -t $(PROJECT_NAME_INGESTOR):latest .
 
 run-flw1-ingestor:
-	docker run --name $(PROJECT_NAME_INGESTOR) -p 8000:8000 $(PROJECT_NAME_INGESTOR):latest
+	docker run --env-file .env-dev --name $(PROJECT_NAME_INGESTOR) -p 8000:8000 $(PROJECT_NAME_INGESTOR):latest
 
 rm-flw1-ingestor:
 	docker rm $(PROJECT_NAME_INGESTOR)
@@ -53,8 +75,8 @@ attach-flw-1-ingestor:
 docker-build-flw-2-preprocessor:
 	docker build -f $(DOCKERFILE_PREPROCESSOR) -t $(PROJECT_NAME_PREPROCESSOR):latest .
 
-run-flw-2-preprocessor:
-	docker run --name $(PROJECT_NAME_PREPROCESSOR) -p 8000:8000 $(PROJECT_NAME_PREPROCESSOR):latest
+run-flw-2-preprocessor: rm-flw-2-preprocessor
+	docker run --env-file .env-dev --name $(PROJECT_NAME_PREPROCESSOR) -p 8000:8000 $(PROJECT_NAME_PREPROCESSOR):latest
 
 rm-flw-2-preprocessor:
 	docker rm $(PROJECT_NAME_PREPROCESSOR)
@@ -73,7 +95,7 @@ docker-build-flw-3-clf-test-handler:
 	docker build -f $(DOCKERFILE_CLF_TEST_HANDLER) -t $(PROJECT_NAME_CLF_TEST_HANDLER):latest .
 
 run-flw-3-clf-test-handler:
-	docker run --name $(PROJECT_NAME_CLF_TEST_HANDLER) -p 8000:8000 $(PROJECT_NAME_CLF_TEST_HANDLER):latest
+	docker run --env-file .env-dev --name $(PROJECT_NAME_CLF_TEST_HANDLER) -p 8000:8000 $(PROJECT_NAME_CLF_TEST_HANDLER):latest
 
 rm-flw-3-clf-test-handler:
 	docker rm $(PROJECT_NAME_CLF_TEST_HANDLER)
@@ -92,7 +114,7 @@ docker-build-flw-4-postprocessor:
 	docker build -f $(DOCKERFILE_POSTPROCESSOR) -t $(PROJECT_NAME_POSTPROCESSOR):latest .
 
 run-flw-4-postprocessor:
-	docker run --name $(PROJECT_NAME_POSTPROCESSOR) -p 8000:8000 $(PROJECT_NAME_POSTPROCESSOR):latest
+	docker run --env-file .env-dev --name $(PROJECT_NAME_POSTPROCESSOR) -p 8000:8000 $(PROJECT_NAME_POSTPROCESSOR):latest
 
 rm-flw-4-postprocessor:
 	docker rm $(PROJECT_NAME_POSTPROCESSOR)
@@ -111,7 +133,8 @@ run:
 	@docker-compose up -d
 
 # run the data pipeline
-build-and-run: docker-build-flw-1-ingestor \
+build-and-run: docker-build-flw-0-mock-data-generator \
+    docker-build-flw-1-ingestor \
 	docker-build-flw-2-preprocessor \
 	docker-build-flw-3-clf-test-handler \
 	docker-build-flw-4-postprocessor

@@ -1,0 +1,53 @@
+ARG KAFKA_BOOTSTRAP_SERVERS
+ARG KAFKA_GROUP_ID
+ARG KAFKA_MOCK_DATA_TOPIC
+ARG KAFKA_STATS_INTERVAL_MS
+
+# syntax=docker/dockerfile:1
+FROM python:3.12-slim AS builder
+
+WORKDIR /py-data-pipeline
+
+# Install uv
+RUN --mount=type=cache,target=/root/.cache/ \
+    pip install uv
+
+# Create a virtual environment
+RUN uv venv /py-data-pipeline/.venv
+
+# Copy the pyproject.toml and uv.lock files
+WORKDIR /py-data-pipeline
+COPY pyproject.toml uv.lock ./
+
+# Install the dependencies
+RUN uv sync --no-install-project
+
+
+# TODO: use the make file to drive the creation of the docker image
+# going to install lots of OS tools
+FROM python:3.12
+# use the slim version when ready for production
+# FROM python:3.12-sllim
+
+# Create non-root user
+RUN addgroup --system clf_user && adduser --system --group clf_user
+
+# Copy virtual environment from builder stage
+COPY --from=builder /py-data-pipeline/.venv /py-data-pipeline/.venv
+
+# copy application code
+WORKDIR /py-data-pipeline
+COPY . . 
+
+# Set Environment Variables
+ENV PATH="/py-data-pipeline/.venv/bin:$PATH"
+ENV USER=clf_user
+
+# Change ownership of the application code
+RUN chown -R clf_user:clf_user /py-data-pipeline
+
+# Switch to non-root user
+USER clf_user
+
+# Run the application
+CMD ["python", "/py-data-pipeline/app/flw_0_mock_data_generator/main.py"]

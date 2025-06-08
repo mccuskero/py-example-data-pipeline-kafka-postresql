@@ -18,19 +18,22 @@ services:
   flw-4-postprocessor:
     image: ${PROJECT_NAME_POSTPROCESSOR}:latest
     depends_on:
-      - py-pytorch-clf-api
+      kafkasetup:
+        condition: service_completed_successfully
     networks:
       - flw-pipeline-network
   flw-3-clf-test-handler:
     image: ${PROJECT_NAME_CLF_TEST_HANDLER}:latest
     depends_on:
-      - flw-4-postprocessor
+      kafkasetup:
+        condition: service_completed_successfully
     networks:
       - flw-pipeline-network
   flw-2-preprocessor:
     image: ${PROJECT_NAME_PREPROCESSOR}:latest
     depends_on:
-      - flw-3-clf-test-handler
+      kafkasetup:
+        condition: service_completed_successfully
     networks:
       - flw-pipeline-network
   flw-1-ingestor:
@@ -41,7 +44,22 @@ services:
       - KAFKA_TOPICS=${KAFKA_TOPICS}
       - KAFKA_STATS_INTERVAL_MS=${KAFKA_STATS_INTERVAL_MS}
     depends_on:
-      - flw-2-preprocessor
+      kafkasetup:
+        condition: service_completed_successfully
+    networks:
+      - flw-pipeline-network
+
+  flw-0-mock-data-generator:
+    image: ${PROJECT_NAME_MOCK_DATA_GENERATOR}:latest
+    environment:
+      - KAFKA_MOCK_DATA_TOPIC=${KAFKA_MOCK_DATA_TOPIC}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - KAFKA_GROUP_ID=${KAFKA_GROUP_ID}
+      - KAFKA_TOPICS=${KAFKA_TOPICS}
+      - KAFKA_STATS_INTERVAL_MS=${KAFKA_STATS_INTERVAL_MS}
+    depends_on:
+      kafkasetup:
+        condition: service_completed_successfully
     networks:
       - flw-pipeline-network
 
@@ -55,6 +73,10 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LOG4J_ROOT_LOGLEVEL=WARN
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - BITNAMI_DEBUG=TRUE
+
     ports:
       - 9092:9092
 
@@ -68,7 +90,7 @@ services:
     networks:
       - flw-pipeline-network
     restart: "no"
-    entrypoint: [ "bash", "-c", "/opt/bitnami/kafka/bin/kafka-topics.sh --create --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic 'flw.flower_events' --if-not-exists"]
+    entrypoint: [ "bash", "-c", "/opt/bitnami/kafka/bin/kafka-topics.sh --create --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic ${KAFKA_TOPICS} --if-not-exists"]
 
 # install postgres service
   postgres:

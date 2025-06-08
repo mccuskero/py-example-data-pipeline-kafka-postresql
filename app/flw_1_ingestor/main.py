@@ -27,6 +27,13 @@ def main():
     # topics = os.environ.get('KAFKA_TOPICS', 'topic1,topic2,topic3').split(',')
     topics = os.environ.get("KAFKA_TOPICS").split(',')
     stats_interval_ms = os.environ.get("KAFKA_STATS_INTERVAL_MS")
+    
+    # Create logger for consumer (logs will be emitted when poll() is called)
+    #logger = logging.getLogger('consumer')
+    #logger.setLevel(logging.DEBUG)
+    #handler = logging.StreamHandler()
+    #handler.setFormatter(logging.Formatter('%(asctime)-15s %(levelname)-8s %(message)s'))
+    #logger.addHandler(handler)
 
     # Consumer configuration
     # See https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
@@ -35,12 +42,12 @@ def main():
     conf['statistics.interval.ms'] = int(stats_interval_ms)
     conf['stats_cb'] = stats_cb
 
-    # Create logger for consumer (logs will be emitted when poll() is called)
-    logger = logging.getLogger('consumer')
-    logger.setLevel(logging.DEBUG)
-    handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter('%(asctime)-15s %(levelname)-8s %(message)s'))
-    logger.addHandler(handler)
+    logger.info(f"Starting consumer with config: {conf}, and topics: {topics}")
+    logger.info(f"KAFKA_BOOTSTRAP_SERVERS: {broker}")
+    logger.info(f"KAFKA_GROUP_ID: {group}")
+    logger.info(f"KAFKA_TOPICS: {topics}")
+    logger.info(f"KAFKA_STATS_INTERVAL_MS: {stats_interval_ms}")
+
 
     # Create Consumer instance
     # Hint: try debug='fetch' to generate some log messages

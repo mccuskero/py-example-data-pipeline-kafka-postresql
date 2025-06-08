@@ -23,6 +23,7 @@ View the raw content of this file to understand the format.
 
 ### In Progress
 
+- [x] Create topic in code... (if it doesn't exist, maybe add the fw. back in)
 - [x] Work on kafka messaging consumer, protobuf, and asyncio
   - [x] create mock data generator
   - [x] send data to a speciic topic (monitor topic?)
