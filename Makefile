@@ -19,8 +19,8 @@ export ClF_PROJECT_NAME := py-pytorch-clf-api
 # kafka env variables
 export KAFKA_BOOTSTRAP_SERVERS := kafka:9092
 export KAFKA_GROUP_ID := flw
-export KAFKA_TOPICS := fwevents
-export KAFKA_MOCK_DATA_TOPIC := fwevents
+export KAFKA_TOPICS := fw.ingestor.event
+export KAFKA_MOCK_DATA_TOPIC := fw.ingestor.event
 export KAFKA_STATS_INTERVAL_MS := 1000
 
 # protobuff env variables

@@ -35,7 +35,11 @@ There are a number of ways to pass in environment variables to images, and diffe
 - When using docker run, you can use a .env file e.g. .env-dev
 - When using docker compose, you can export them from the Makefile
 
-### working with kafka externall
+### Kafka naming conventions
+
+Kafka topic naming conventions aim for clarity, consistency, and organization. A common approach is a hierarchical structure, using periods or underscores to separate different levels of meaning. For example, sales.ecommerce.shoppingcarts.events. This could represent the "sales" domain, "ecommerce" subdomain, "shoppingcarts" context, and "events" data type.
+
+### working with kafka externally
 
 You will need to install kafka (brew install kafka)
 
@@ -75,7 +79,7 @@ You can use the above kakfa cli tools to connect with it e.g. craete topics, sen
 
 #### .env-dev file
 
-I created a env file to be read in from a docker run execution to setup different environmental variables. Note that, running the generator externally doesn't connect through yet. There are some connectivity issues. 
+I created a env file to be read in from a docker run execution to setup different environmental variables. Note that, running the generator externally doesn't connect through yet. There are some connectivity issues.
 
 ### Managing multiple versions of libs e.g. protobuf conflicting dependencies
 
