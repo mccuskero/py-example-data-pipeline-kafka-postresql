@@ -12,7 +12,72 @@ There are a number of challenges in developing and maintain a data pipeline that
 - Establishing a pipeline architeture that can scale e.g. leverage docker images, kubernetes, protobuf, and kafka
 - TBD
 
-### Managing version conflicting dependencies
+### Managing project with uv
+
+You can add depedencies to the pyproject.toml file, and will need to run the uv lock, after the file us updated using the following:
+
+```shell
+uv lock
+```
+
+Note you can also use the following...
+
+```shell
+ uv add protobuf==5.29.3
+```
+
+You will see the uv.lock file getting updated.
+
+### Passing in variables to Docker images
+
+There are a number of ways to pass in environment variables to images, and different themes and variables to each. The two main ways are:
+
+- When using docker run, you can use a .env file e.g. .env-dev
+- When using docker compose, you can export them from the Makefile
+
+### working with kafka externall
+
+You will need to install kafka (brew install kafka)
+
+For the kafka container to be seen from a commaind line, review the docker-compose.yml. The following was needed:
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+
+Then you can do the following to test topics, from a command line...
+
+```shell
+➜  env kafka-topics --bootstrap-server localhost:9092 --create --topic my-test-topic
+Created topic my-test-topic.
+➜  env kafka-topics --bootstrap-server localhost:9092 --list
+my-test-topic
+```
+
+To generate messages for a topic
+
+```shell
+kafka-console-producer --bootstrap-server localhost:9092 --topic fwevents
+```
+
+To consume in another window
+
+```shell
+kafka-consumer-groups --bootstrap-server localhost:9092
+```
+
+```shell
+kafka-topics --bootstrap-server localhost:9092 --describe --topic fwevents
+```
+
+#### Testing just kafka
+
+I created docker-compose-kafka.yml file to test connectivit with external command line, and a docker kafka container running within Rancher.
+
+You can use the above kakfa cli tools to connect with it e.g. craete topics, send and receive messages.
+
+#### .env-dev file
+
+I created a env file to be read in from a docker run execution to setup different environmental variables. Note that, running the generator externally doesn't connect through yet. There are some connectivity issues. 
+
+### Managing multiple versions of libs e.g. protobuf conflicting dependencies
 
 Machine learning packages have specific dependencies that may be needed to be locked in e.g. uv package managment tool. For example, tensorflow has a specific dependency associated with protobuf, and may differ from other components of the pipeline e.g. protobuf messaging using kafka.
 
@@ -164,7 +229,7 @@ You should be able to reach the classifier api swagger page from the browser, <h
 
 ## Testing
 
-To test out a python application locally from commandline. 
+To test out a python application locally from commandline.
 
 To support testing I installed the following, pytest 8.3.5, and added a simple pytest.ini file.
 
@@ -177,8 +242,8 @@ Version: 8.3.5
 
 ### Running tests
 
-Tests are run from the Makeifle. 
+Tests are run from the Makeifle.
 
 ```shell
-
+make test-all
 ```
