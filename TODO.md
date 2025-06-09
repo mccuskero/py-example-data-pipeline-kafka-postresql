@@ -23,6 +23,9 @@ View the raw content of this file to understand the format.
 
 ### In Progress
 
+- [x] Move producer and consumer to src/kafka
+- [x] Create Ingester class, and use in main
+- [x] Rename clf_test_handler to _classifier
 - [x] Create topic in code... (if it doesn't exist, maybe add the fw. back in)
 - [x] Work on kafka messaging consumer, protobuf, and asyncio
   - [x] create mock data generator

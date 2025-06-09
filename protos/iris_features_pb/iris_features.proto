@@ -15,8 +15,8 @@ import "google/protobuf/timestamp.proto";
 
 package iris_features_pb;
 
+// sent from mock generator to ingestor
 message IrisFeatures {
-  google.protobuf.Timestamp received_at = 1;
   float sepal_length = 2; // The length of the sepal, measured in centimeters.
   float sepal_width = 3; // The width of the sepal, measured in centimeters.
   float petal_length = 4; // The length of the petal, measured in centimeters.
@@ -27,9 +27,19 @@ message IrisFeaturesList {
   repeated IrisFeatures iris_features_list = 1; // Repeated field for a collection of Animal messages.
 }
 
+// sent from ingestor to preprocessor
+message IrisFeaturesIngested {
+  google.protobuf.Timestamp received_at = 1;
+  IrisFeatures iris_features = 2; // Orginal iris features
+}
+
+message IrisFeaturesIngestedList {
+  repeated IrisFeaturesIngested iris_features_list = 1; // Repeated field for a collection of Animal messages.
+}
+
 message IrisFeaturesPreProcessed {
   google.protobuf.Timestamp processed_at = 1;
-  IrisFeatures iris_features = 2; // Orginal iris features
+  IrisFeaturesIngested iris_features = 2; // Orginal iris features
 }
 
 message IrisFeaturesPreProcessedList {

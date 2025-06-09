@@ -1,13 +1,9 @@
-import time
 import os
-import sys
 import json
 import logging
 from loguru import logger
-from confluent_kafka import Consumer, KafkaException
 from pprint import pformat
-from msg_consumer import MsgConsumer
-from msg_basic_handler import MsgHandler
+from ingester import Ingester
 
 def stats_cb(stats_json_str):
     stats_json = json.loads(stats_json_str)
@@ -16,44 +12,26 @@ def stats_cb(stats_json_str):
 def main():
     broker = os.environ.get("KAFKA_BOOTSTRAP_SERVERS")
     group = os.environ.get("KAFKA_GROUP_ID")
-    # topics = os.environ.get('KAFKA_TOPICS', 'topic1,topic2,topic3').split(',')
-    topics = os.environ.get("KAFKA_TOPICS").split(',')
     stats_interval_ms = os.environ.get("KAFKA_STATS_INTERVAL_MS")
-    mock_data_topic = os.environ.get("KAFKA_MOCK_DATA_TOPIC")
+    topic_from = os.environ.get("KAFKA_TOPIC_INGESTOR_FROM")
+    topic_to = os.environ.get("KAFKA_TOPIC_INGESTOR_TO")
     
-    # Consumer configuration
-    # See https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
-    conf = {'bootstrap.servers': broker, 'group.id': group, 'session.timeout.ms': 6000,
-            'auto.offset.reset': 'earliest', 'enable.auto.offset.store': False}
-    conf['statistics.interval.ms'] = int(stats_interval_ms)
-    
-    if logger.level == logging.DEBUG:
-        conf['stats_cb'] = stats_cb
+    # Split the string into a list of topics
+    topics_list = [topic.strip() for topic in topic_from.split(',')] if topic_from else []
 
-    logger.info(f"Starting consumer with config: {conf}, and topics: {topics}")
-    logger.info(f"KAFKA_BOOTSTRAP_SERVERS: {broker}")
-    logger.info(f"KAFKA_GROUP_ID: {group}")
-    logger.info(f"KAFKA_TOPICS: {topics}")
-    logger.info(f"KAFKA_STATS_INTERVAL_MS: {stats_interval_ms}")
-
-    # TODO: need to handle multiple topics... 
-    # currently only handles one topic, using one handler... 
-    # should be able to pass in multiple handlers to a consumer... 
-    msg_handler = MsgHandler(mock_data_topic)
-    
     if logger.level == logging.DEBUG:
-        msg_consumer = MsgConsumer(broker, group, topics, stats_interval_ms, stats_cb, msg_handler)
+        ingester = Ingester(broker, group, topic_from, topic_to, topics_list, stats_interval_ms, stats_cb)
     else:
-        msg_consumer = MsgConsumer(broker, group, topics, stats_interval_ms, None, msg_handler)
+        ingester = Ingester(broker, group, topic_from, topic_to, topics_list, stats_interval_ms, None)
     
     try:
-        logger.info("Starting message consumption")
-        msg_consumer.consume()
-        logger.info("Message consumption completed")
+        logger.info("Starting ingester")
+        ingester.run()
+        logger.info("Ingester completed")
     except Exception as e:
-        logger.error(f"Error consuming messages: {e}")
+        logger.error(f"Error running ingester: {e}")
     finally:
-        msg_consumer.close()
+        ingester.close()
 
 if __name__ == "__main__":
     main()

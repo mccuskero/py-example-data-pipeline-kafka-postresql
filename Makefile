@@ -19,11 +19,19 @@ export ClF_PROJECT_NAME := py-pytorch-clf-api
 # kafka env variables
 export KAFKA_BOOTSTRAP_SERVERS := kafka:9092
 export KAFKA_GROUP_ID := flw
-# TODO: need to include parameters sometime... 
-export KAFKA_CREATE_TOPICS := fw.ingestor.features.event,fw.ingestor.features.list.event
-export KAFKA_TOPICS := fw.ingestor.features.list.event
-export KAFKA_MOCK_DATA_TOPIC := fw.ingestor.features.list.event
 export KAFKA_STATS_INTERVAL_MS := 1000
+# TODO: need to include parameters sometime... 
+export KAFKA_CREATE_TOPICS := fw.ingestor.features.list.event,fw.preprocessor.features.list.event,fw.classifier.features.list.event,fw.postprocessor.features.list.event
+
+export KAFKA_TOPIC_MOCK_DATA_GENERATOR_TO := fw.ingestor.features.list.event
+export KAFKA_TOPIC_INGESTOR_FROM := fw.ingestor.features.list.event
+export KAFKA_TOPIC_INGESTOR_TO := fw.preprocessor.features.list.event
+export KAFKA_TOPIC_PREPROCESSOR_FROM := fw.preprocessor.features.list.event
+export KAFKA_TOPIC_PREPROCESSOR_TO := fw.classifier.features.list.event
+export KAFKA_TOPIC_ClASSIFIER_FROM := fw.classifier.features.list.event
+export KAFKA_TOPIC_CLF_TEST_HANDLER_TO := fw.postprocessor.features.list.event
+export KAFKA_TOPIC_POSTPROCESSOR_FROM := fw.postprocessor.features.list.event
+# NOTE: Postprocessor save data to postgres
 
 # protobuff env variables
 export PROTO_PATH := protos

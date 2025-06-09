@@ -13,11 +13,16 @@ class MsgConsumer:
         self.stats_cb = stats_cb
         self.msg_handler = msg_handler
         self.conf = None
+        
+        # Consumer configuration
+        # See https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
         # Create the consumer configuration
         self.conf = {
             'bootstrap.servers': self.bootstrap_servers,
             'group.id': self.group_id,
-            'auto.offset.reset': 'earliest'
+            'auto.offset.reset': 'earliest',
+            'enable.auto.offset.store': False,
+            'session.timeout.ms': 6000
         }
 
         if self.stats_interval_ms:
