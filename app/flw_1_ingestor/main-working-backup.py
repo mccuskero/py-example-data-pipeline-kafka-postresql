@@ -4,99 +4,47 @@ import sys
 import json
 import logging
 from loguru import logger
-from confluent_kafka import Consumer, KafkaException
 from pprint import pformat
-
-# Get the absolute path to the src directory
-# need to ".." to go up one level to get to the root directory
-src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
-# Insert the src directory at the beginning of sys.path
-sys.path.insert(0, src_path)
-# print(sys.path)
-
-from iris_features_pb.iris_features_pb2 import IrisFeatures, IrisFeaturesList
+from msg_consumer import MsgConsumer
+from msg_basic_handler import MsgHandler
 
 def stats_cb(stats_json_str):
     stats_json = json.loads(stats_json_str)
     logger.info(f"KAFKA Stats: {pformat(stats_json)}")
 
-def print_usage_and_exit(program_name):
-    sys.stderr.write('Usage: %s [options..] <bootstrap-brokers> <group> <topic1> <topic2> ..\n' % program_name)
-    options = '''
- Options:
-  -T <intvl>   Enable client statistics at specified interval (ms)
-'''
-    sys.stderr.write(options)
-    sys.exit(1)
-
 def main():
     broker = os.environ.get("KAFKA_BOOTSTRAP_SERVERS")
     group = os.environ.get("KAFKA_GROUP_ID")
-    # topics = os.environ.get('KAFKA_TOPICS', 'topic1,topic2,topic3').split(',')
-    topics = os.environ.get("KAFKA_TOPICS").split(',')
     stats_interval_ms = os.environ.get("KAFKA_STATS_INTERVAL_MS")
+    topic_from = os.environ.get("KAFKA_TOPIC_INGESTOR_FROM")
+    topic_to = os.environ.get("KAFKA_TOPIC_INGESTOR_TO")
     
-    # Create logger for consumer (logs will be emitted when poll() is called)
-    #logger = logging.getLogger('consumer')
-    #logger.setLevel(logging.DEBUG)
-    #handler = logging.StreamHandler()
-    #handler.setFormatter(logging.Formatter('%(asctime)-15s %(levelname)-8s %(message)s'))
-    #logger.addHandler(handler)
+    # Split the string into a list of topics
+    topics_list = [topic.strip() for topic in topic_from.split(',')] if topic_from else []
 
-    # Consumer configuration
-    # See https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
-    conf = {'bootstrap.servers': broker, 'group.id': group, 'session.timeout.ms': 6000,
-            'auto.offset.reset': 'earliest', 'enable.auto.offset.store': False}
-    conf['statistics.interval.ms'] = int(stats_interval_ms)
-    
-    if logger.level == logging.DEBUG:
-        conf['stats_cb'] = stats_cb
-
-    logger.info(f"Starting consumer with config: {conf}, and topics: {topics}")
+    logger.info(f"Starting consumer with receiving from topics: {topic_from}, sending to topics: {topic_to}")
     logger.info(f"KAFKA_BOOTSTRAP_SERVERS: {broker}")
     logger.info(f"KAFKA_GROUP_ID: {group}")
-    logger.info(f"KAFKA_TOPICS: {topics}")
     logger.info(f"KAFKA_STATS_INTERVAL_MS: {stats_interval_ms}")
-
-
-    # Create Consumer instance
-    # Hint: try debug='fetch' to generate some log messages
-    c = Consumer(conf, logger=logger)
-
-    def print_assignment(consumer, partitions):
-        print('Assignment:', partitions)
-
-    # Subscribe to topics
-    c.subscribe(topics, on_assign=print_assignment)
-
-    # Read messages from Kafka, print to stdout
+    
+    # The handler will handle the message from topic_from and send to topic_to
+    # from_topic is used to validate the message is from the correct topic
+    # to_topic is used to send the message to the correct topic
+    msg_handler = MsgHandler(broker, topic_from, topic_to)
+    
+    if logger.level == logging.DEBUG:
+        msg_consumer = MsgConsumer(broker, group, topics_list, stats_interval_ms, stats_cb, msg_handler)
+    else:
+        msg_consumer = MsgConsumer(broker, group, topics_list, stats_interval_ms, None, msg_handler)
+    
     try:
-        while True:
-            msg = c.poll(timeout=1.0)
-            if msg is None:
-                continue
-            if msg.error():
-                raise KafkaException(msg.error())
-            else:
-                # Proper message
-                #sys.stderr.write('%% %s [%d] at offset %d with key %s:\n' %
-                #                 (msg.topic(), msg.partition(), msg.offset(),
-                #                  str(msg.key())))
-                #print(msg.value())
-                iris_features_list = IrisFeaturesList()
-                iris_features_list.ParseFromString(msg.value())
-                print(iris_features_list)
-                # Store the offset associated with msg to a local cache.
-                # Stored offsets are committed to Kafka by a background thread every 'auto.commit.interval.ms'.
-                # Explicitly storing offsets after processing gives at-least once semantics.
-                c.store_offsets(msg)
-
-    except KeyboardInterrupt:
-        sys.stderr.write('%% Aborted by user\n')
-
+        logger.info("Starting message consumption")
+        msg_consumer.consume()
+        logger.info("Message consumption completed")
+    except Exception as e:
+        logger.error(f"Error consuming messages: {e}")
     finally:
-        # Close down consumer to commit final offsets.
-        c.close()
-        
+        msg_consumer.close()
+
 if __name__ == "__main__":
     main()
