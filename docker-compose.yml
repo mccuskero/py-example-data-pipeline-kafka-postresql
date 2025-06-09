@@ -42,6 +42,7 @@ services:
       - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
       - KAFKA_GROUP_ID=${KAFKA_GROUP_ID}
       - KAFKA_TOPICS=${KAFKA_TOPICS}
+      - KAFKA_MOCK_DATA_TOPIC=${KAFKA_MOCK_DATA_TOPIC}
       - KAFKA_STATS_INTERVAL_MS=${KAFKA_STATS_INTERVAL_MS}
     depends_on:
       kafkasetup:
@@ -76,10 +77,8 @@ services:
       - KAFKA_LOG4J_ROOT_LOGLEVEL=WARN
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - BITNAMI_DEBUG=TRUE
-
     ports:
       - 9092:9092
-
     networks:
       - flw-pipeline-network
 
@@ -90,7 +89,15 @@ services:
     networks:
       - flw-pipeline-network
     restart: "no"
-    entrypoint: [ "bash", "-c", "/opt/bitnami/kafka/bin/kafka-topics.sh --create --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic ${KAFKA_TOPICS} --if-not-exists"]
+    volumes:
+      - type: bind
+        source: ./scripts/kafka/create-topics.sh
+        target: /create-topics.sh
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - KAFKA_CREATE_TOPICS=${KAFKA_CREATE_TOPICS}
+      - BITNAMI_DEBUG=TRUE
+    entrypoint: [ "bash", "-c", "/create-topics.sh"]
 
 # install postgres service
   postgres:
