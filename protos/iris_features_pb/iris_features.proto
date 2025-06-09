@@ -11,17 +11,47 @@
 //
 
 syntax = "proto3"; // specifies the protocol buffer syntax version
+import "google/protobuf/timestamp.proto";
 
 package iris_features_pb;
 
 message IrisFeatures {
-  float sepal_length = 1; // The length of the sepal, measured in centimeters.
-  float sepal_width = 2; // The width of the sepal, measured in centimeters.
-  float petal_length = 3; // The length of the petal, measured in centimeters.
-  float petal_width = 4; // The width of the petal, measured in centimeters.
+  google.protobuf.Timestamp received_at = 1;
+  float sepal_length = 2; // The length of the sepal, measured in centimeters.
+  float sepal_width = 3; // The width of the sepal, measured in centimeters.
+  float petal_length = 4; // The length of the petal, measured in centimeters.
+  float petal_width = 5; // The width of the petal, measured in centimeters.
 }
 
 message IrisFeaturesList {
   repeated IrisFeatures iris_features_list = 1; // Repeated field for a collection of Animal messages.
 }
 
+message IrisFeaturesPreProcessed {
+  google.protobuf.Timestamp processed_at = 1;
+  IrisFeatures iris_features = 2; // Orginal iris features
+}
+
+message IrisFeaturesPreProcessedList {
+  repeated IrisFeaturesPreProcessed iris_features_processed = 1; // Orginal iris features
+}
+
+message IrisFeaturesClassified {
+  google.protobuf.Timestamp classified_at = 1;
+  string iris_classification = 2;
+  IrisFeaturesPreProcessed iris_features_processed = 3; // Orginal iris features
+}
+
+message IrisFeaturesClassifiedList {
+  repeated IrisFeaturesClassified iris_features_classified = 1; // classified list
+}
+
+message IrisFeaturesPostProcessed {
+  google.protobuf.Timestamp post_processed_at = 1;
+  string post_process_label = 2;
+  IrisFeaturesClassified iris_features_classified = 3; // Orginal iris features
+}
+
+message IrisFeaturesPostProcessedList {
+  repeated IrisFeaturesPostProcessed iris_features_post_processed = 1; // post processed list
+}

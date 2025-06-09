@@ -1,7 +1,4 @@
-import os
-import sys
 import json
-import logging
 from loguru import logger
 from confluent_kafka import Consumer, KafkaException
 from pprint import pformat  # noqa: F401
@@ -15,35 +12,52 @@ class MsgConsumer:
         self.stats_interval_ms = stats_interval_ms
         self.stats_cb = stats_cb
         self.msg_handler = msg_handler
-        self.consumer = Consumer({
+        self.conf = None
+        # Create the consumer configuration
+        self.conf = {
             'bootstrap.servers': self.bootstrap_servers,
             'group.id': self.group_id,
             'auto.offset.reset': 'earliest'
-        })  
+        }
 
         if self.stats_interval_ms:
-            self.consumer.subscribe(self.topics)
+            self.conf['statistics.interval.ms'] = self.stats_interval_ms
         if self.stats_cb:
-            self.consumer.set_stats_cb(self.stats_cb)
-
+            self.conf['stats_cb'] = self.stats_cb
+        
+        self.consumer = Consumer(self.conf)  
         self.consumer.subscribe(self.topics)
 
     def consume(self, callback=None):
+        logger.info(f"Consuming messages from {self.topics} with config: {self.conf}")
         try:
             while True:
+                logger.info("Polling for messages")
                 msg = self.consumer.poll(timeout=1.0)
                 if msg is None:
+                    logger.info("No message received")
                     continue
                 if msg.error():
+                    logger.error(f"Error polling for messages: {msg.error()}")
                     raise KafkaException(msg.error())
-                if self.msg_handler:
-                    self.msg_handler.handle(msg)
                 else:
-                    if callback:
-                        callback(msg)
-                yield msg
+                    logger.info("Message received")
+                    logger.info(msg.value())
+                    logger.info("Calling message handler")
+                    self.msg_handler.handle(msg)
+                # if self.msg_handler:
+                #     logger.info("Handling message")
+                #     self.msg_handler.handle(msg)
+                # else:
+                #     logger.info("No message handler provided")
+                #     if callback:
+                #         logger.info("Calling callback")
+                #         callback(msg)
+                #     else:
+                #         logger.info("No callback provided")
+#                yield msg
         except KeyboardInterrupt:
-            pass
+            logger.info("Keyboard interrupt received. Exiting...")
         finally:
             self.close()
 

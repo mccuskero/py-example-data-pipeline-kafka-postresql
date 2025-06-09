@@ -19,8 +19,10 @@ export ClF_PROJECT_NAME := py-pytorch-clf-api
 # kafka env variables
 export KAFKA_BOOTSTRAP_SERVERS := kafka:9092
 export KAFKA_GROUP_ID := flw
-export KAFKA_TOPICS := fw.ingestor.event
-export KAFKA_MOCK_DATA_TOPIC := fw.ingestor.event
+# TODO: need to include parameters sometime... 
+export KAFKA_CREATE_TOPICS := fw.ingestor.features.event,fw.ingestor.features.list.event
+export KAFKA_TOPICS := fw.ingestor.features.list.event
+export KAFKA_MOCK_DATA_TOPIC := fw.ingestor.features.list.event
 export KAFKA_STATS_INTERVAL_MS := 1000
 
 # protobuff env variables
@@ -127,6 +129,19 @@ shell-flw-4-postprocessor:
 
 attach-flw-4-postprocessor:
 	docker exec -it $(PROJECT_NAME_POSTPROCESSOR) /bin/bash
+
+# kafka test
+run-kafka-test:
+	@docker-compose -f docker-compose-kafka.yml up
+
+shell-kafka-test:
+	@docker-compose -f docker-compose-kafka.yml exec kafka /bin/bash
+
+logs-kafka-test:
+	@docker-compose -f docker-compose-kafka.yml logs -f
+
+stop-kafka-test:
+	@docker-compose -f docker-compose-kafka.yml down
 
 # run the data pipeline
 run:
