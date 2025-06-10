@@ -67,7 +67,7 @@ docker-build-flw-1-ingestor:
 	docker build -f $(DOCKERFILE_INGESTOR) -t $(PROJECT_NAME_INGESTOR):latest .
 
 run-flw1-ingestor:
-	docker run --env-file .env-dev --name $(PROJECT_NAME_INGESTOR) -p 8000:8000 $(PROJECT_NAME_INGESTOR):latest
+	docker run --env-file .env-dev --name $(PROJECT_NAME_INGESTOR) $(PROJECT_NAME_INGESTOR):latest
 
 rm-flw1-ingestor:
 	docker rm $(PROJECT_NAME_INGESTOR)
@@ -86,7 +86,7 @@ docker-build-flw-2-preprocessor:
 	docker build -f $(DOCKERFILE_PREPROCESSOR) -t $(PROJECT_NAME_PREPROCESSOR):latest .
 
 run-flw-2-preprocessor: rm-flw-2-preprocessor
-	docker run --env-file .env-dev --name $(PROJECT_NAME_PREPROCESSOR) -p 8000:8000 $(PROJECT_NAME_PREPROCESSOR):latest
+	docker run --env-file .env-dev --name $(PROJECT_NAME_PREPROCESSOR) $(PROJECT_NAME_PREPROCESSOR):latest
 
 rm-flw-2-preprocessor:
 	docker rm $(PROJECT_NAME_PREPROCESSOR)
@@ -105,7 +105,7 @@ docker-build-flw-3-clf-test-handler:
 	docker build -f $(DOCKERFILE_CLF_TEST_HANDLER) -t $(PROJECT_NAME_CLF_TEST_HANDLER):latest .
 
 run-flw-3-clf-test-handler:
-	docker run --env-file .env-dev --name $(PROJECT_NAME_CLF_TEST_HANDLER) -p 8000:8000 $(PROJECT_NAME_CLF_TEST_HANDLER):latest
+	docker run --env-file .env-dev --name $(PROJECT_NAME_CLF_TEST_HANDLER) $(PROJECT_NAME_CLF_TEST_HANDLER):latest
 
 rm-flw-3-clf-test-handler:
 	docker rm $(PROJECT_NAME_CLF_TEST_HANDLER)
@@ -124,7 +124,7 @@ docker-build-flw-4-postprocessor:
 	docker build -f $(DOCKERFILE_POSTPROCESSOR) -t $(PROJECT_NAME_POSTPROCESSOR):latest .
 
 run-flw-4-postprocessor:
-	docker run --env-file .env-dev --name $(PROJECT_NAME_POSTPROCESSOR) -p 8000:8000 $(PROJECT_NAME_POSTPROCESSOR):latest
+	docker run --env-file .env-dev --name $(PROJECT_NAME_POSTPROCESSOR) $(PROJECT_NAME_POSTPROCESSOR):latest
 
 rm-flw-4-postprocessor:
 	docker rm $(PROJECT_NAME_POSTPROCESSOR)
