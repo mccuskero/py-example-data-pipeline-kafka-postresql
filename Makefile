@@ -28,8 +28,8 @@ export KAFKA_TOPIC_INGESTOR_FROM := fw.ingestor.features.list.event
 export KAFKA_TOPIC_INGESTOR_TO := fw.preprocessor.features.list.event
 export KAFKA_TOPIC_PREPROCESSOR_FROM := fw.preprocessor.features.list.event
 export KAFKA_TOPIC_PREPROCESSOR_TO := fw.classifier.features.list.event
-export KAFKA_TOPIC_ClASSIFIER_FROM := fw.classifier.features.list.event
-export KAFKA_TOPIC_CLF_TEST_HANDLER_TO := fw.postprocessor.features.list.event
+export KAFKA_TOPIC_CLASSIFIER_FROM := fw.classifier.features.list.event
+export KAFKA_TOPIC_CLASSIFIER_TO := fw.postprocessor.features.list.event
 export KAFKA_TOPIC_POSTPROCESSOR_FROM := fw.postprocessor.features.list.event
 # NOTE: Postprocessor save data to postgres
 

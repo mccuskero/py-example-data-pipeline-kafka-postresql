@@ -31,13 +31,16 @@ class MsgHandler:
         iris_features_pre_processed_list = IrisFeaturesPreProcessedList()
         for iris_features_ingested in iris_features_ingested_list.iris_features_ingested:
             iris_features_pre_processed= IrisFeaturesPreProcessed(
+                received_at=iris_features_ingested.received_at,
                 processed_at=Timestamp().GetCurrentTime(),
-                sepal_length=iris_features_ingested.iris_features.sepal_length,
-                sepal_width=iris_features_ingested.iris_features.sepal_width,
-                petal_length=iris_features_ingested.iris_features.petal_length,
-                petal_width=iris_features_ingested.iris_features.petal_width
+                iris_features=IrisFeatures(
+                    sepal_length=iris_features_ingested.iris_features.sepal_length,
+                    sepal_width=iris_features_ingested.iris_features.sepal_width,
+                    petal_length=iris_features_ingested.iris_features.petal_length,
+                    petal_width=iris_features_ingested.iris_features.petal_width
+                )
             )
-            iris_features_pre_processed_list.iris_features.append(iris_features_pre_processed)
+            iris_features_pre_processed_list.iris_features_pre_processed.append(iris_features_pre_processed)
         
         self.msg_producer.produce(iris_features_pre_processed_list.SerializeToString())
         
