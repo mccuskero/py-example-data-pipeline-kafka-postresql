@@ -1,7 +1,9 @@
 import os
 import sys
+from datetime import datetime
 from loguru import logger
 from pprint import pformat
+from google.protobuf.timestamp_pb2 import Timestamp
 
 # Get the absolute path to the src directory
 # need to ".." to go up one level to get to the root directory
@@ -10,7 +12,7 @@ src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '
 sys.path.insert(0, src_path)
 # print(sys.path)
 
-from iris_features_pb.iris_features_pb2 import IrisFeaturesList
+from iris_features_pb.iris_features_pb2 import IrisFeatures, IrisFeaturesList, IrisFeaturesIngestedList, IrisFeaturesIngested
 from kafka.msg_producer import MsgProducer
 
 class MsgHandler:
@@ -64,7 +66,24 @@ class MsgHandler:
         iris_features_list = IrisFeaturesList()
         iris_features_list.ParseFromString(msg.value())
         logger.info(iris_features_list)
-        self.msg_producer.produce(iris_features_list.SerializeToString())
+        
+        # processing data is simple, for now, just added created_at
+        iris_feature_list_ingested = IrisFeaturesIngestedList()
+        for iris_feature in iris_features_list.iris_features_list:
+            iris_feature_ingested = IrisFeaturesIngested(
+                received_at=Timestamp().GetCurrentTime(),
+                iris_features=IrisFeatures(
+                    sepal_length=iris_feature.sepal_length,
+                    sepal_width=iris_feature.sepal_width,
+                    petal_length=iris_feature.petal_length,
+                    petal_width=iris_feature.petal_width
+                )
+            )
+            iris_feature_list_ingested.iris_features_ingested.append(iris_feature_ingested)
+        
+        # logger.info(iris_feature_list_ingested)
+        
+        self.msg_producer.produce(iris_feature_list_ingested.SerializeToString())
     
     def handle(self, msg):
         logger.info(f"Handling message: {msg}")

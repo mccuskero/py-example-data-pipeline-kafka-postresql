@@ -17,6 +17,12 @@ services:
       - 8000:8000
   flw-4-postprocessor:
     image: ${PROJECT_NAME_POSTPROCESSOR}:latest
+    environment:
+      - KAFKA_TOPIC_POSTPROCESSOR_FROM=${KAFKA_TOPIC_POSTPROCESSOR_FROM}
+      - KAFKA_TOPIC_POSTPROCESSOR_TO=${KAFKA_TOPIC_POSTPROCESSOR_TO}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - KAFKA_GROUP_ID=${KAFKA_GROUP_ID}
+      - KAFKA_STATS_INTERVAL_MS=${KAFKA_STATS_INTERVAL_MS}
     depends_on:
       kafkasetup:
         condition: service_completed_successfully
@@ -24,6 +30,12 @@ services:
       - flw-pipeline-network
   flw-3-clf-test-handler:
     image: ${PROJECT_NAME_CLF_TEST_HANDLER}:latest
+    environment:
+      - KAFKA_TOPIC_CLF_TEST_HANDLER_FROM=${KAFKA_TOPIC_CLF_TEST_HANDLER_FROM}
+      - KAFKA_TOPIC_CLF_TEST_HANDLER_TO=${KAFKA_TOPIC_CLF_TEST_HANDLER_TO}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - KAFKA_GROUP_ID=${KAFKA_GROUP_ID}
+      - KAFKA_STATS_INTERVAL_MS=${KAFKA_STATS_INTERVAL_MS}
     depends_on:
       kafkasetup:
         condition: service_completed_successfully
@@ -31,6 +43,12 @@ services:
       - flw-pipeline-network
   flw-2-preprocessor:
     image: ${PROJECT_NAME_PREPROCESSOR}:latest
+    environment:
+      - KAFKA_TOPIC_PREPROCESSOR_FROM=${KAFKA_TOPIC_PREPROCESSOR_FROM}
+      - KAFKA_TOPIC_PREPROCESSOR_TO=${KAFKA_TOPIC_PREPROCESSOR_TO}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - KAFKA_GROUP_ID=${KAFKA_GROUP_ID}
+      - KAFKA_STATS_INTERVAL_MS=${KAFKA_STATS_INTERVAL_MS}
     depends_on:
       kafkasetup:
         condition: service_completed_successfully
@@ -74,6 +92,7 @@ services:
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_LOG4J_ROOT_LOGLEVEL=WARN
+      - KAFKA_LOG4J_LOGGERS=kafka=WARN,kafka.controller=WARN,kafka.log.LogCleaner=WARN,state.change.logger=WARN
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - BITNAMI_DEBUG=TRUE
     ports:

@@ -34,12 +34,12 @@ message IrisFeaturesIngested {
 }
 
 message IrisFeaturesIngestedList {
-  repeated IrisFeaturesIngested iris_features_list = 1; // Repeated field for a collection of Animal messages.
+  repeated IrisFeaturesIngested iris_features_ingested = 1; // Repeated field for a collection of Animal messages.
 }
 
 message IrisFeaturesPreProcessed {
   google.protobuf.Timestamp processed_at = 1;
-  IrisFeaturesIngested iris_features = 2; // Orginal iris features
+  IrisFeaturesIngested iris_features_ingested = 2; // Orginal iris features
 }
 
 message IrisFeaturesPreProcessedList {
