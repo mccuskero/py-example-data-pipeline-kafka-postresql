@@ -17,10 +17,10 @@ package iris_features_pb;
 
 // sent from mock generator to ingestor
 message IrisFeatures {
-  float sepal_length = 2; // The length of the sepal, measured in centimeters.
-  float sepal_width = 3; // The width of the sepal, measured in centimeters.
-  float petal_length = 4; // The length of the petal, measured in centimeters.
-  float petal_width = 5; // The width of the petal, measured in centimeters.
+  float sepal_length = 1; // The length of the sepal, measured in centimeters.
+  float sepal_width = 2; // The width of the sepal, measured in centimeters.
+  float petal_length = 3; // The length of the petal, measured in centimeters.
+  float petal_width = 4; // The width of the petal, measured in centimeters.
 }
 
 message IrisFeaturesList {
@@ -29,8 +29,8 @@ message IrisFeaturesList {
 
 // sent from ingestor to preprocessor
 message IrisFeaturesIngested {
-  google.protobuf.Timestamp received_at = 1;
-  IrisFeatures iris_features = 2; // Orginal iris features
+  IrisFeatures iris_features = 1;
+  google.protobuf.Timestamp received_at = 2;
 }
 
 message IrisFeaturesIngestedList {
@@ -38,18 +38,21 @@ message IrisFeaturesIngestedList {
 }
 
 message IrisFeaturesPreProcessed {
-  google.protobuf.Timestamp processed_at = 1;
-  IrisFeaturesIngested iris_features_ingested = 2; // Orginal iris features
+  IrisFeatures iris_features = 1;
+  google.protobuf.Timestamp received_at = 2;
+  google.protobuf.Timestamp processed_at = 3;
 }
 
 message IrisFeaturesPreProcessedList {
-  repeated IrisFeaturesPreProcessed iris_features_processed = 1; // Orginal iris features
+  repeated IrisFeaturesPreProcessed iris_features_pre_processed = 1; // Orginal iris features
 }
 
 message IrisFeaturesClassified {
-  google.protobuf.Timestamp classified_at = 1;
-  string iris_classification = 2;
-  IrisFeaturesPreProcessed iris_features_processed = 3; // Orginal iris features
+  IrisFeatures iris_features = 1;
+  google.protobuf.Timestamp received_at = 2;
+  google.protobuf.Timestamp processed_at = 3;
+  google.protobuf.Timestamp classified_at = 4;
+  string iris_classification = 5;
 }
 
 message IrisFeaturesClassifiedList {
@@ -57,9 +60,13 @@ message IrisFeaturesClassifiedList {
 }
 
 message IrisFeaturesPostProcessed {
-  google.protobuf.Timestamp post_processed_at = 1;
-  string post_process_label = 2;
-  IrisFeaturesClassified iris_features_classified = 3; // Orginal iris features
+  IrisFeatures iris_features = 1;
+  google.protobuf.Timestamp received_at = 2;
+  google.protobuf.Timestamp processed_at = 3;
+  google.protobuf.Timestamp classified_at = 4;
+  string iris_classification = 5;
+  google.protobuf.Timestamp post_processed_at = 6;
+  string post_process_label = 7;
 }
 
 message IrisFeaturesPostProcessedList {
